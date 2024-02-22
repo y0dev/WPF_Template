@@ -31,21 +31,21 @@ namespace SampleWPF_CHeader
 		{
 			// Navigate to the subpage
 			contentFrame.NavigationUIVisibility = NavigationUIVisibility.Hidden; // Hide history bar
-			contentFrame.Navigate(new MacrosPage());
+			contentFrame.Navigate(new MacrosPage("header.h"));
 		}
 
 		private void Item2_Click(object sender, RoutedEventArgs e)
 		{
 			// Navigate to the subpage
 			contentFrame.NavigationUIVisibility = NavigationUIVisibility.Hidden; // Hide history bar
-			contentFrame.Navigate(new MacrosPage());
+			contentFrame.Navigate(new MacrosPage("header.h"));
 		}
 
 		private void Item3_Click(object sender, RoutedEventArgs e)
 		{
 			// Navigate to the subpage
 			contentFrame.NavigationUIVisibility = NavigationUIVisibility.Hidden; // Hide history bar
-			contentFrame.Navigate(new MacrosPage());
+			contentFrame.Navigate(new MacrosPage("header.h"));
 		}
 	}
 

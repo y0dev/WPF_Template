@@ -17,30 +17,23 @@ namespace SampleWPF_CHeader
 	{
 
 		private bool hasChanges = false;
+		private string filePath = "header.h";
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public bool HasChanges
-		{
-			get { return hasChanges; }
-			set
-			{
-				hasChanges = value;
-				OnPropertyChanged("HasChanges");
-				saveButton.IsEnabled = value;
-			}
-		}
 
 		public ObservableCollection<DefineMacro> DefineMacros { get; set; } = new ObservableCollection<DefineMacro>();
-		public MacrosPage()
+		public MacrosPage(string filePath)
         {
-            InitializeComponent(); LoadDefines();
+            InitializeComponent();
+			this.filePath = filePath;
+			LoadDefines();
 			DataContext = this;
 		}
 
 		private void LoadDefines()
 		{
 			// Read the header file and extract #define macros
-			string[] lines = File.ReadAllLines("header.h");
+			string[] lines = File.ReadAllLines(this.filePath);
 			foreach (string line in lines)
 			{
 				if (line.StartsWith("#define"))
@@ -50,6 +43,7 @@ namespace SampleWPF_CHeader
 					{
 						string macroName = parts[1];
 						string macroValue = parts[2];
+						Console.WriteLine($"Macro Name: {macroName}\tMacro Value: {macroValue}");
 						DefineMacros.Add(new DefineMacro { Name = macroName, Value = macroValue });
 					}
 				}
@@ -89,10 +83,11 @@ namespace SampleWPF_CHeader
 		private void GenerateBackupFile()
 		{
 			// Get the file path
-			string filePath = "header.h";
+			string filePath = this.filePath;
+			string[] parts = filePath.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
 			// Generate backup file name
-			string backupFileName = $"{filePath}_{DateTime.Now:yyyyMMddHHmmss}.bak";
+			string backupFileName = $"{parts[0]}_{DateTime.Now:yyyyMMddHHmmss}.h.bak";
 
 			try
 			{
@@ -107,9 +102,24 @@ namespace SampleWPF_CHeader
 
 		private void SaveFile()
 		{
-			// Save file logic goes here
-			// For simplicity, let's just display a message
-			MessageBox.Show("File saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+			string filePath = this.filePath;
+			try
+			{
+				// Write the updated macros to the file
+				using (StreamWriter writer = new StreamWriter(filePath))
+				{
+					foreach (DefineMacro macro in listViewDefines.Items)
+					{
+						writer.WriteLine($"#define {macro.Name} {macro.Value}");
+					}
+				}
+
+				MessageBox.Show("File saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
+			catch (IOException ex)
+			{
+				MessageBox.Show($"Error saving file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
 		private void OnPropertyChanged(string propertyName)
@@ -130,6 +140,34 @@ namespace SampleWPF_CHeader
 		{
 			HasChanges = true; // Set changes flag when text changes
 		}
+
+		private void textBoxNewValue_LostFocus(object sender, RoutedEventArgs e)
+		{
+			// Get the selected item from the ListView
+			DefineMacro selectedMacro = (DefineMacro)listViewDefines.SelectedItem;
+
+			// If an item is selected and the TextBox is not null or empty
+			if (selectedMacro != null && !string.IsNullOrEmpty(textBoxNewValue.Text))
+			{
+				// Update the value of the selected macro
+				selectedMacro.Value = textBoxNewValue.Text;
+
+				// Refresh the ListView to reflect the changes
+				listViewDefines.Items.Refresh();
+			}
+		}
+
+		public bool HasChanges
+		{
+			get { return hasChanges; }
+			set
+			{
+				hasChanges = value;
+				OnPropertyChanged("HasChanges");
+				saveButton.IsEnabled = value;
+			}
+		}
+
 	}
 
 	public class DefineMacro

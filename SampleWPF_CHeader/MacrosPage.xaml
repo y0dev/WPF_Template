@@ -8,8 +8,8 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Macros Page">
 
-    <Grid>
-		<ListView x:Name="listViewDefines" Margin="10" SelectionMode="Single">
+	<Grid>
+		<ListView x:Name="listViewDefines" Margin="10" SelectionMode="Single"  ItemsSource="{Binding DefineMacros}">
 			<ListView.View>
 				<GridView>
 					<GridViewColumn Header="Macro Name" Width="150" DisplayMemberBinding="{Binding Name}"/>
@@ -17,16 +17,13 @@
 				</GridView>
 			</ListView.View>
 		</ListView>
-		<TextBox x:Name="textBoxNewValue" Margin="10,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="150"/>
+		<TextBox x:Name="textBoxNewValue" Margin="10,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="150" LostFocus="textBoxNewValue_LostFocus"/>
 		<Button x:Name="buttonUpdate" Content="Update Value" Margin="170,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="buttonUpdate_Click"/>
-
 
 		<!-- Cancel Button -->
 		<Button Content="Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,60,10" Click="Cancel_Click"/>
-		
+
 		<!-- Save Button -->
 		<Button x:Name="saveButton"  Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Click="Save_Click" IsEnabled="False"/>
-		
-
 	</Grid>
 </Page>

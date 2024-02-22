@@ -7,18 +7,20 @@ using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace SampleWPF_CHeader
 {
     /// <summary>
     /// Interaction logic for Page1.xaml
     /// </summary>
-    public partial class MacrosPage : Page, INotifyPropertyChanged
+    public partial class MacrosPage : Page
 	{
 
 		private bool hasChanges = false;
 		private string filePath = "header.h";
 		public event PropertyChangedEventHandler PropertyChanged;
+		private Dictionary<string, List<string>> validValuesMap = new Dictionary<string, List<string>>();
 
 
 		public ObservableCollection<DefineMacro> DefineMacros { get; set; } = new ObservableCollection<DefineMacro>();
@@ -26,8 +28,32 @@ namespace SampleWPF_CHeader
         {
             InitializeComponent();
 			this.filePath = filePath;
+			LoadValidValues("config.xml");
 			LoadDefines();
 			DataContext = this;
+		}
+
+		private void LoadValidValues(string configFilePath)
+		{
+			if (File.Exists(configFilePath))
+			{
+				string fileName = Path.GetFileName(this.filePath);
+				XDocument doc = XDocument.Load(configFilePath);
+				foreach (XElement fileElement in doc.Root.Elements("file"))
+				{
+					string fileNameAttribute = fileElement.Attribute("name")?.Value;
+					var macros = new List<string>();
+					if(fileNameAttribute == fileName)
+					{
+						foreach (XElement macroElement in fileElement.Elements("macro"))
+						{
+							string macroName = macroElement.Attribute("name").Value;
+							string allowedValues = macroElement.Attribute("allowedValues").Value;
+							validValuesMap.Add(macroName, allowedValues.Split(',').ToList());
+						}
+					}
+				}
+			}
 		}
 
 		private void LoadDefines()
@@ -43,22 +69,13 @@ namespace SampleWPF_CHeader
 					{
 						string macroName = parts[1];
 						string macroValue = parts[2];
-						Console.WriteLine($"Macro Name: {macroName}\tMacro Value: {macroValue}");
-						DefineMacros.Add(new DefineMacro { Name = macroName, Value = macroValue });
+						List<string> validValues = validValuesMap.ContainsKey(macroName) ? validValuesMap[macroName] : null;
+						DefineMacros.Add(new DefineMacro { Name = macroName, Value = macroValue, ValidValues = validValues });
 					}
 				}
 			}
 		}
-
-		private void buttonUpdate_Click(object sender, RoutedEventArgs e)
-		{
-			// Update the value of the selected macro
-			if (listViewDefines.SelectedItem != null)
-			{
-				DefineMacro selectedMacro = (DefineMacro)listViewDefines.SelectedItem;
-				selectedMacro.Value = textBoxNewValue.Text;
-			}
-		}
+		
 
 		private void Save_Click(object sender, RoutedEventArgs e)
 		{
@@ -108,7 +125,7 @@ namespace SampleWPF_CHeader
 				// Write the updated macros to the file
 				using (StreamWriter writer = new StreamWriter(filePath))
 				{
-					foreach (DefineMacro macro in listViewDefines.Items)
+					foreach (DefineMacro macro in dataGridDefines.Items)
 					{
 						writer.WriteLine($"#define {macro.Name} {macro.Value}");
 					}
@@ -133,27 +150,20 @@ namespace SampleWPF_CHeader
 			// For simplicity, let's just reset changes flag
 			HasChanges = false;
 		}
+		
 
-		// Add your logic to track changes, e.g., in text boxes, etc.
-		// For demonstration, let's track changes using a sample textbox
-		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+		private void dataGridDefines_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
 		{
-			HasChanges = true; // Set changes flag when text changes
-		}
-
-		private void textBoxNewValue_LostFocus(object sender, RoutedEventArgs e)
-		{
-			// Get the selected item from the ListView
-			DefineMacro selectedMacro = (DefineMacro)listViewDefines.SelectedItem;
-
-			// If an item is selected and the TextBox is not null or empty
-			if (selectedMacro != null && !string.IsNullOrEmpty(textBoxNewValue.Text))
+			if (e.EditAction == DataGridEditAction.Commit)
 			{
-				// Update the value of the selected macro
-				selectedMacro.Value = textBoxNewValue.Text;
-
-				// Refresh the ListView to reflect the changes
-				listViewDefines.Items.Refresh();
+				// Update the source only if the cell is focused
+				var textBox = e.EditingElement as ComboBox;
+				if (textBox != null && textBox.IsFocused)
+				{
+					var selectedMacro = (DefineMacro)dataGridDefines.SelectedItem;
+					selectedMacro.Value = textBox.SelectedItem.ToString();
+					HasChanges = true; // Set changes flag when text changes
+				}
 			}
 		}
 
@@ -170,9 +180,33 @@ namespace SampleWPF_CHeader
 
 	}
 
-	public class DefineMacro
+	public class DefineMacro: INotifyPropertyChanged
 	{
+		private string _value;
 		public string Name { get; set; }
-		public string Value { get; set; }
+		public string Value
+		{
+			get => _value;
+			set
+			{
+				if(_value != value)
+				{
+					_value = value;
+					OnPropertyChanged(nameof(Value));
+				}
+			}
+		}
+		public List<string> ValidValues { get; set; }
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public DefineMacro()
+		{
+			ValidValues = new List<string>();
+		}
+
+		protected virtual void OnPropertyChanged(string propertyName)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
 	}
 }

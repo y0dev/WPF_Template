@@ -1,0 +1,12 @@
+<!-- macros_config.xml -->
+<config>
+    <file name="header1.h">
+        <macro name="MACRO1" allowedValues="100,200,300" />
+        <!-- Add more macro elements as needed -->
+    </file>
+    <file name="header2.h">
+        <macro name="MACRO2" allowedValues="value4,value5,value6" />
+        <!-- Add more macro elements as needed -->
+    </file>
+    <!-- Add more file elements as needed -->
+</config>

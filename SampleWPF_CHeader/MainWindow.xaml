@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SampleWPF_CHeader"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="750" Width="1400">
     <Grid>
 		<!-- Logo -->
 		<Image Source="logo.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Height="100"/>
@@ -22,35 +22,35 @@
 
 			<Button Grid.Row="0" Click="Item1_Click">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Width="100">
-					<Image Source="image1.png" Height="30" Width="30" Margin="5"/>
+					<Image Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ImagePath}" Height="30" Width="30" Margin="5"/>
 					<TextBlock Text="Item 1" Margin="5"/>
 				</StackPanel>
 			</Button>
 
 			<Button Grid.Row="1" Click="Item2_Click">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Width="100">
-					<Image Source="image2.png" Height="30" Width="30" Margin="5"/>
+					<Image Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ImagePath}" Height="30" Width="30" Margin="5"/>
 					<TextBlock Text="Item 2" Margin="5"/>
 				</StackPanel>
 			</Button>
 
 			<Button Grid.Row="2" Click="Item3_Click">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Width="100">
-					<Image Source="image3.png" Height="30" Width="30" Margin="5"/>
+					<Image Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ImagePath}" Height="30" Width="30" Margin="5"/>
 					<TextBlock Text="Item 3" Margin="5"/>
 				</StackPanel>
 			</Button>
 
 			<Button Grid.Row="3">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Width="100">
-					<Image Source="image4.png" Height="30" Width="30" Margin="5"/>
+					<Image Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ImagePath}" Height="30" Width="30" Margin="5"/>
 					<TextBlock Text="Item 4" Margin="5"/>
 				</StackPanel>
 			</Button>
 
 			<Button Grid.Row="4">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Width="100">
-					<Image Source="image5.png" Height="30" Width="30" Margin="5"/>
+					<Image Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ImagePath}" Height="30" Width="30" Margin="5"/>
 					<TextBlock Text="Item 5" Margin="5"/>
 				</StackPanel>
 			</Button>

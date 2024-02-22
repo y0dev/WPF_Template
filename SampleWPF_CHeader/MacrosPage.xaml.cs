@@ -18,6 +18,7 @@ namespace SampleWPF_CHeader
 	{
 
 		private bool hasChanges = false;
+		private DefineMacro originalMacro;
 		private string filePath = "header.h";
 		public event PropertyChangedEventHandler PropertyChanged;
 		private Dictionary<string, List<string>> validValuesMap = new Dictionary<string, List<string>>();
@@ -146,9 +147,14 @@ namespace SampleWPF_CHeader
 
 		private void Cancel_Click(object sender, RoutedEventArgs e)
 		{
-			// Undo changes logic goes here
-			// For simplicity, let's just reset changes flag
-			HasChanges = false;
+			// For simplicity, let's just reset changes flag and revert the edited value
+			var selectedMacro = (DefineMacro)dataGridDefines.SelectedItem;
+			if (selectedMacro != null && originalMacro != null)
+			{
+				selectedMacro.Value = originalMacro.Value; // Revert back to the original value
+				originalMacro = null; // Clear the original value
+			}
+			HasChanges = false; // Reset changes flag
 		}
 		
 
@@ -157,11 +163,20 @@ namespace SampleWPF_CHeader
 			if (e.EditAction == DataGridEditAction.Commit)
 			{
 				// Update the source only if the cell is focused
-				var textBox = e.EditingElement as ComboBox;
-				if (textBox != null && textBox.IsFocused)
+				var comboBox = e.EditingElement as ComboBox;
+				if (comboBox != null && comboBox.IsFocused)
 				{
+					// Store the original value before editing
+					originalMacro = new DefineMacro
+					{
+						Name = ((DefineMacro)dataGridDefines.SelectedItem).Name,
+						Value = ((DefineMacro)dataGridDefines.SelectedItem).Value,
+						ValidValues = ((DefineMacro)dataGridDefines.SelectedItem).ValidValues
+					};
+
+					// Update the selected macro value
 					var selectedMacro = (DefineMacro)dataGridDefines.SelectedItem;
-					selectedMacro.Value = textBox.SelectedItem.ToString();
+					selectedMacro.Value = comboBox.SelectedItem.ToString();
 					HasChanges = true; // Set changes flag when text changes
 				}
 			}

@@ -22,9 +22,17 @@ namespace SampleWPF_CHeader
 	/// 
 	public partial class MainWindow : Window
 	{
+
+		public string ImagePath { get; set; }
 		public MainWindow()
 		{
 			InitializeComponent();
+			string currentDirectory = Environment.CurrentDirectory;
+			Console.WriteLine("Current Directory: " + currentDirectory);
+			ImagePath = $"{currentDirectory}/image1.png";
+			// Or, you can use a relative path:
+			// ImagePath = @"..\..\..\..\Path\To\Your\Workspace\image1.png";
+			DataContext = this;
 		}
 
 		private void Item1_Click(object sender, RoutedEventArgs e)
